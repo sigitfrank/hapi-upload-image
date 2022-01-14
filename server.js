@@ -1,9 +1,16 @@
 const Hapi = require('@hapi/hapi')
 const Inert = require('@hapi/inert')
-const server = Hapi.Server({ port: 5000 })
 const fs = require('fs')
+const Path = require('path')
 
-
+const server = Hapi.Server({
+    port: 5000,
+    routes: {
+        files: {
+            relativeTo: Path.join(__dirname, 'public')
+        }
+    },
+})
 const handleFileUpload = (file, filename) => {
     return new Promise((resolve, reject) => {
         fs.writeFile(`./public/assets/${Date.now()}-${filename}`, file, err => {
@@ -15,6 +22,14 @@ const handleFileUpload = (file, filename) => {
 
 const init = async () => {
     await server.register(Inert)
+    server.route({
+        method: 'GET',
+        path: '/image/{filename}',
+        handler: function (request, h) {
+            const { filename } = request.params
+            return h.file(`./assets/${filename}`);
+        }
+    });
     server.route({
         path: '/upload',
         method: 'POST',
