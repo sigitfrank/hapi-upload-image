@@ -28,10 +28,9 @@ const init = async () => {
             },
             handler: async (req, h) => {
                 const { payload } = req
-                const promise = fs.promises.readFile(payload.image.path);
-                const response = await promise.then(function (buffer) {
-                    return handleFileUpload(buffer, payload.image.filename)
-                });
+                const bufferFile = fs.promises.readFile(payload.image.path);
+                const response = await bufferFile.then((buffer) => handleFileUpload(buffer, payload.image.filename)
+                );
                 return response
             }
         }
